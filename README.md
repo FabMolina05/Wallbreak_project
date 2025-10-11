@@ -12,7 +12,7 @@ Estos pasos te guiarán para crear un **entorno virtual** y **instalar todas las
 
 ```bash
 git clone https://github.com/tu_usuario/Wallbreak_project.git
-cd wallbreak
+cd Wallbreak_project
 ```
 
 ### 2️⃣ Crear un entorno virtual
