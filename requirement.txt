@@ -1,3 +1,5 @@
 google-genai
-pyaudio
 SpeechRecognition
+pyttsx3
+pyDub
+   
