@@ -3,12 +3,13 @@ from pydub import AudioSegment
 from pydub.playback import play
 import pyttsx3
 import threading
+from google import genai
 # Dispositivos de audio disponibles
 #m = None
 #for i, microphone_name in enumerate(sr.Microphone.list_microphone_names()):
 #   print(f"Microphone with name \"{microphone_name}\" found for `Microphone(device_index={i})`")
 
-from google import genai
+
 
 client = genai.Client(api_key="AIzaSyBEQRCjHyVHg6smwCabwTHz1xJvu4uSz78")
 
