@@ -10,7 +10,6 @@ from google import genai
 #   print(f"Microphone with name \"{microphone_name}\" found for `Microphone(device_index={i})`")
 
 
-
 client = genai.Client(api_key="AIzaSyBEQRCjHyVHg6smwCabwTHz1xJvu4uSz78")
 
 flag = True
