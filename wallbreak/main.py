@@ -6,15 +6,20 @@ import pyttsx3
 import threading
 from google import genai
 import time
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+
 
 # Dispositivos de audio disponibles
 #m = None
 #for i, microphone_name in enumerate(sr.Microphone.list_microphone_names()):
 #   print(f"Microphone with name \"{microphone_name}\" found for `Microphone(device_index={i})`")
 
-
 # Variables globales
-client = genai.Client(api_key="AIzaSyBEQRCjHyVHg6smwCabwTHz1xJvu4uSz78")
+#(varaible de genai)client = genai.Client(api_key="AIzaSyBEQRCjHyVHg6smwCabwTHz1xJvu4uSz78")
+
+model_name = "Helsinki-NLP/opus-mt-es-en"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
 
 flag = True
 
@@ -63,12 +68,16 @@ def output_voice(tiempo,text,r=r,):
                 stop_event.set()
                 print("Saliendo...")
                 return
-            response = client.models.generate_content(
-                            model="gemini-2.5-flash",
-                            contents=f"Tradúceme esto al inglés: {text}, hazlo informal y sin texto extra.",
-            )
+            #response = client.models.generate_content(
+            #                model="gemini-2.5-flash",
+            #                contents=f"Tradúceme esto al inglés: {text}, hazlo informal y sin texto extra.",
+            #)
+            inputs = tokenizer(text, return_tensors="pt", padding=True)
+            translated = model.generate(**inputs)
+            resultado = tokenizer.decode(translated[0], skip_special_tokens=True)
+
             print("llego hasta aqui")
-            text_queue.put(response.text)
+            text_queue.put(resultado)
             tiempo_final = time.time()
             print(f"Tiempo de respuesta: {tiempo_final - tiempo} segundos")
     except sr.UnknownValueError:
