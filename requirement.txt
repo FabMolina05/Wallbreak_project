@@ -3,3 +3,7 @@ pyaudio
 SpeechRecognition
 pyttsx3
 pyDub
+
+
+INTERFAZ
+- TKinter
