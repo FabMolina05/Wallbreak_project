@@ -1,5 +1,6 @@
-google-genai
 pyaudio
 SpeechRecognition
-pyttsx3
 pyDub
+transformer
+sounddevice
+gtts
