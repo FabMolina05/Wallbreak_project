@@ -3,7 +3,6 @@ import speech_recognition as sr
 from pydub import AudioSegment
 from pydub.playback import play
 import threading
-from google import genai
 import time
 from transformers import AutoTokenizer,VitsModel, AutoModelForSeq2SeqLM
 import sounddevice as sd

@@ -34,4 +34,9 @@ python -m venv .venv
 pip install -r requirement.txt
 ```
 
+### OBSERVACIONES
 
+Es posible que se tenga que instalar el ffmpeg para que funcione la app
+
+TUTORIAL PARA INSTALAR FFMPEG
+https://www.youtube.com/watch?v=re_IEwXlcXU
