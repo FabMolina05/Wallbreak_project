@@ -4,16 +4,13 @@ from pydub.playback import play
 import pyttsx3
 import threading
 from google import genai
-# Dispositivos de audio disponibles
-#m = None
-#for i, microphone_name in enumerate(sr.Microphone.list_microphone_names()):
-#   print(f"Microphone with name \"{microphone_name}\" found for `Microphone(device_index={i})`")
+import tkinter as tk
 
+# CONFIGURACIÓN
 
 client = genai.Client(api_key="AIzaSyBEQRCjHyVHg6smwCabwTHz1xJvu4uSz78")
 
-flag = True
-
+flag = False
 lock = threading.Lock()
 
 engine = pyttsx3.init()
@@ -22,43 +19,87 @@ engine.setProperty('voice', voices[2].id)
 
 r = sr.Recognizer()
 
+# FUNCIONES UI
+
+def actualizar_texto(original, traduccion):
+    output_text.configure(state="normal")
+    output_text.delete("1.0", tk.END)
+    output_text.insert(tk.END, f"🗣 Tú dijiste:\n{original}\n\n")
+    output_text.insert(tk.END, f"🌍 Traducción:\n{traduccion}")
+    output_text.configure(state="disabled")
+
+# LÓGICA
 
 def output_voice(audio):
-        try:
-            global flag
-            print("hilo creado")
-            text = r.recognize_google(audio, language="es-ES")
-            print("Has dicho: {}".format(text))
-            with lock:
-                if text.lower() == "salir":
-                        flag = False
-                        print("Saliendo...")
-                        return
-            response = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents="Tradúceme esto al inglés: {} , hazlo de una manera informar, y que la respuesta no contenga texto complementario, solo la respuesta".format(text),
-            )
-            engine.say(response.text)
-            engine.runAndWait()
-            engine.stop()
-                
+    try:
+        global flag
+        text = r.recognize_google(audio, language="es-ES")
+        print("Has dicho:", text)
 
-            print("Traducción: {}".format(response.text))
-        except sr.UnknownValueError:
-            print("No se pudo entender el audio")
-        except sr.RequestError as e:
-            print(f"Error al solicitar resultados; {e}")
+        with lock:
+            if text.lower() == "salir":
+                flag = False
+                root.after(0, lambda: status_label.config(text="Estado: detenido"))
+                return
 
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=f"Tradúceme esto al inglés: {text}, sin texto adicional"
+        )
 
-while flag:
+        engine.say(response.text)
+        engine.runAndWait()
+        engine.stop()
+
+        print("Traducción:", response.text)
+
+        # actualizar UI de forma segura
+        root.after(0, actualizar_texto, text, response.text)
+
+    except sr.UnknownValueError:
+        print("No se pudo entender el audio")
+    except sr.RequestError as e:
+        print("Error:", e)
+
+# BUCLE DE ESCUCHA
+
+def escuchar():
+    global flag
+    while flag:
+        with sr.Microphone(device_index=0) as source:
+            audio = r.listen(source)
+            threading.Thread(target=output_voice, args=(audio,), daemon=True).start()
+
+# BOTONES
+
+def iniciar():
+    global flag
     if not flag:
-        break
-    with sr.Microphone(device_index=0) as source:
-            print("Di algo...")
-            audio = r.listen(source) 
-            hilo = threading.Thread(target=output_voice, args=(audio,))
-            hilo.start()
-            
-            
-    
-        
+        flag = True
+        status_label.config(text="Estado: escuchando")
+        threading.Thread(target=escuchar, daemon=True).start()
+
+def detener():
+    global flag
+    flag = False
+    status_label.config(text="Estado: detenido")
+
+# INTERFAZ TKINTER
+
+root = tk.Tk()
+root.title("Wallbreak - Traductor por Voz")
+root.geometry("420x350")
+root.resizable(False, False)
+
+tk.Label(root, text="Wallbreak", font=("Arial", 16)).pack(pady=5)
+
+status_label = tk.Label(root, text="Estado: detenido")
+status_label.pack()
+
+output_text = tk.Text(root, height=10, width=45, state="disabled")
+output_text.pack(pady=10)
+
+tk.Button(root, text="Iniciar", width=15, command=iniciar).pack(pady=3)
+tk.Button(root, text="Detener", width=15, command=detener).pack(pady=3)
+
+root.mainloop()
