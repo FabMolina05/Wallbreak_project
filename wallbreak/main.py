@@ -54,7 +54,7 @@ record_device = 0
 
 def get_playback_devices():
     devices = sd.query_devices()
-    playback_devices = [device for device in devices if device['max_output_channels'] > 0][:5]
+    playback_devices = [device for device in devices if device['max_output_channels'] > 0]
     return playback_devices
 
 def get_record_devices():
@@ -249,7 +249,7 @@ record_devices = get_record_devices()
 
 tk.Label(root, text="Selecciona dispositivo de reproducción:").pack()
 playback_var = tk.StringVar(root)
-playback_menu = tk.OptionMenu(root, playback_var, *[f"{i}: {dev['name']}" for i, dev in enumerate(playback_devices)])
+playback_menu = tk.OptionMenu(root, playback_var, *[f"{dev['index']}: {dev['name']}" for i, dev in enumerate(playback_devices)])
 playback_menu.pack()
 
 tk.Label(root, text="Selecciona dispositivo de grabación:").pack()
